@@ -2,7 +2,7 @@
 # Please change this: -----------------------------------------------------
 
 # Directory where all the code files are located
-shiny_app_dir <<- "/home/akhil/Documents/winlab/code/"
+shiny_app_dir <<- "/home/akhil/Documents/winlab/code/ammonia_plotter"
 
 # List of directory/files to load as given below for example. Files have end in .csv only.
 data_dir <<- list(
