@@ -13,13 +13,22 @@ data_dir <<- list(
   "/home/akhil/Downloads/20190521_180247.csv"
   )
 
+# Plot type, can be: linePoint, line, point
+plot_type <<- "point"
+
+# Sets the height of the plot area
+plot_height <<- 700
+# Sets the width of the plot area
+plot_width <<- 1300
+
 # That's it ---------------------------------------------------------------
 
 # The following command is used to get the milliseconds information stored in posixct Timestamp
 options(digits.secs = 3)
 
 # Sets the time-zone for the data loaded
-time_zone <<- "EDT"
+Sys.setenv(TZ = "America/New_York")
+options(tz = "America/New_York")
 
 # Remove all the global variables on stopping the shiny app
 shiny::onStop(function(){

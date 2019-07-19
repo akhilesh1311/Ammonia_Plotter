@@ -6,6 +6,7 @@ library(scales)
 library(readr)
 library(tidyverse)
 library(lubridate)
+library(Cairo)
 
 print("Loading data")
 setwd(dir = shiny_app_dir)

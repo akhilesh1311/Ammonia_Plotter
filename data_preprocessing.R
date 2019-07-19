@@ -31,9 +31,9 @@ preprocess2 <- function(data){
   data <- data %>%
     add_column(!!(timestamp_diff) := data$Timestamp - data$Timestamp[[1]]) %>% 
     add_column(!!(sequence_diff) := c(data$`sequence number` %>% diff(lag = 1), NA))
-  data$Date <- mdy_hms(data$Date, tz=time_zone)
+  data$Date <- mdy_hms(data$Date, tz = getOption("tz"))
   data$`Tag ID` <- as.character(data$`Tag ID`)
-  data$posix_Timestamp <- as.POSIXct(data$Timestamp/1000, origin = "1970-01-01", tz = time_zone)
+  data$posix_Timestamp <- as.POSIXct(data$Timestamp/1000, origin = "1970-01-01", tz = getOption("tz"))
   return (data)
 }
 

@@ -25,16 +25,35 @@ parse_custom_input <- function(custom_input){
 
 # Helper function for adding a plot with option "All"
 add_plot_all <- function(plot_data){
+  if (plot_type == "linePoint"){
     main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data) +
       geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data)
+  }
+  else if (plot_type == "point") {
+    main_plot <<- main_plot + geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data)
+  }
+  else if (plot_type == "line") {
+    main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data)
+  }
 }
 
 # Helper function for adding a plot with option "Last"
 add_plot_last <- function(plot_data){
-  main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>% 
-                                        subset(sequence_diff < 0)) +
-    geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>% 
-                 subset(sequence_diff < 0))
+  if (plot_type == "linePoint") {
+    main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                                          subset(sequence_diff < 0)) +
+      geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                   subset(sequence_diff < 0))
+    
+  }
+  else if (plot_type == "point") {
+    main_plot <<- main_plot + geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                                           subset(sequence_diff < 0))
+  }
+  else if (plot_type == "line") {
+    main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                                          subset(sequence_diff < 0))
+  }
 }
 
 # Helper function for adding a plot with option "Cutom"
@@ -46,10 +65,20 @@ add_plot_custom <- function(plot_data, custom_input){
   if (nrow(plot_data %>% filter(`sequence number` %in% sequences)) == 0){
     sequences <- list(1)
   }
-  main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>% 
-                                        filter(`sequence number` %in% sequences)) +
-    geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>% 
-                 filter(`sequence number` %in% sequences))
+  if (plot_type == "linePoint") {
+    main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                                          filter(`sequence number` %in% sequences)) +
+      geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                   filter(`sequence number` %in% sequences))
+  }
+  else if (plot_type == "point") {
+    main_plot <<- main_plot + geom_point(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                                           filter(`sequence number` %in% sequences))
+  }
+  else if (plot_type == "line") {
+    main_plot <<- main_plot + geom_line(mapping = aes(x = posix_Timestamp, y = adc, color = `Tag ID`), data = plot_data %>%
+                                          filter(`sequence number` %in% sequences))
+  }
 }
 
 server <- function(input, output, session) {
@@ -86,8 +115,8 @@ server <- function(input, output, session) {
           # by filtering the date/time and sensor ID
           plot_data <- lapply(seq_along(df_list), function(index) if (names(df_list)[index] == sensor)
             return (df_list[[names(df_list)[index]]] %>% 
-                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = time_zone) & 
-                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = time_zone)))) %>% 
+                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = getOption("tz")) & 
+                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = getOption("tz"))))) %>% 
             bind_rows()
 
           # Adding the plot to main_plot
@@ -163,8 +192,8 @@ server <- function(input, output, session) {
           # adding the plot with new options/custom input
           plot_data <- lapply(seq_along(df_list), function(index) if (names(df_list)[index] == sensor)
             return (df_list[[names(df_list)[index]]] %>% 
-                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = time_zone) & 
-                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = time_zone)))) %>% 
+                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = getOption("tz")) & 
+                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = getOption("tz"))))) %>% 
             bind_rows()
           if (input[[sensor]] == "All"){
             add_plot_all(plot_data)
@@ -201,8 +230,8 @@ server <- function(input, output, session) {
           }
           plot_data <- lapply(seq_along(df_list), function(index) if (names(df_list)[index] == sensor)
             return (df_list[[names(df_list)[index]]] %>% 
-                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = time_zone) & 
-                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = time_zone)))) %>% 
+                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = getOption("tz")) & 
+                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = getOption("tz"))))) %>% 
             bind_rows()
           if (input[[sensor]] == "All"){
             add_plot_all(plot_data)
