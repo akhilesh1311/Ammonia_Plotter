@@ -86,10 +86,10 @@ server <- function(input, output, session) {
           # by filtering the date/time and sensor ID
           plot_data <- lapply(seq_along(df_list), function(index) if (names(df_list)[index] == sensor)
             return (df_list[[names(df_list)[index]]] %>% 
-                      subset(subset = posix_Timestamp >= as_datetime(paste(input$date[[1]], current_from_time, sep = " ")) & 
-                               posix_Timestamp <= as_datetime(paste(input$date[[2]], current_to_time, sep = " "))))) %>% 
+                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = time_zone) & 
+                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = time_zone)))) %>% 
             bind_rows()
-          
+
           # Adding the plot to main_plot
           if (input[[sensor]] == "All"){
             add_plot_all(plot_data)
@@ -163,8 +163,8 @@ server <- function(input, output, session) {
           # adding the plot with new options/custom input
           plot_data <- lapply(seq_along(df_list), function(index) if (names(df_list)[index] == sensor)
             return (df_list[[names(df_list)[index]]] %>% 
-                      subset(subset = posix_Timestamp >= as_datetime(paste(input$date[[1]], current_from_time, sep = " ")) & 
-                               posix_Timestamp <= as_datetime(paste(input$date[[2]], current_to_time, sep = " "))))) %>% 
+                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = time_zone) & 
+                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = time_zone)))) %>% 
             bind_rows()
           if (input[[sensor]] == "All"){
             add_plot_all(plot_data)
@@ -201,8 +201,8 @@ server <- function(input, output, session) {
           }
           plot_data <- lapply(seq_along(df_list), function(index) if (names(df_list)[index] == sensor)
             return (df_list[[names(df_list)[index]]] %>% 
-                      subset(subset = posix_Timestamp >= as_datetime(paste(input$date[[1]], current_from_time, sep = " ")) & 
-                               posix_Timestamp <= as_datetime(paste(input$date[[2]], current_to_time, sep = " "))))) %>% 
+                      subset(subset = posix_Timestamp >= as.POSIXct(paste(input$date[[1]], current_from_time, sep = " "), tz = time_zone) & 
+                               posix_Timestamp <= as.POSIXct(paste(input$date[[2]], current_to_time, sep = " "), tz = time_zone)))) %>% 
             bind_rows()
           if (input[[sensor]] == "All"){
             add_plot_all(plot_data)
@@ -245,7 +245,6 @@ server <- function(input, output, session) {
   observeEvent(input$main_plot_dblclick, {
     brush <- input$main_plot_brush
     if (!is.null(brush)){
-      cat(brush$xmin, " ", brush$xmax, "\n")
       ranges$x <- c(as.POSIXct(brush$xmin, origin = "1970-01-01"), as.POSIXct(brush$xmax, origin = "1970-01-01"))
       ranges$y <- c(brush$ymin, brush$ymax)
     } else {
